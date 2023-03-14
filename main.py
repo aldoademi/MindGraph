@@ -1,16 +1,12 @@
 import cv2
 
 # Carica l'immagine
-img = cv2.imread('/home/aldoademi/Desktop/targets/economist_daily_chart_153.png')
+img = cv2.imread('/home/aldoademi/Desktop/targets/economist_daily_chart_103.png')
 
-# Converte l'immagine in formato CV_32FC1
+# Converte l'immagine in formato CV_32FC1 e in scala di grigi
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype('float32') / 255
-
 img_scaled = img * 255
 img_scaled = img_scaled.astype('uint8')
-
-# Converte l'immagine in scala di grigi
-#gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 # Calcola la mappa dei salienti dell'immagine con il metodo "Spectral Residual"
 saliency_map = cv2.saliency.StaticSaliencySpectralResidual_create().computeSaliency(img)
