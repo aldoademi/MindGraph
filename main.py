@@ -40,13 +40,31 @@ def select_image():
         
         # Aggiorna l'interfaccia grafica con il grado di memorabilità calcolato
         result_label.config(text=f"Grado di memorabilità dell'immagine: {memorability:.2f}")
+
+        # Ridimensiona la maschera di salienza alle dimensioni dell'immagine originale
+        saliency_mask = cv2.resize(saliency_mask, (img.shape[1], img.shape[0]))
+        
+        # crea una maschera di forma (height, width, 1)
+        saliency_mask = np.expand_dims(saliency_mask, axis=2)
+
+        # replica la matrice (4,) lungo l'asse 2 per creare una matrice (height, width, 4)
+        overlay = np.tile(np.array([0, 0, 255, 128], dtype=np.uint8), (saliency_mask.shape[0], saliency_mask.shape[1], 1))
+
+        overlay = cv2.cvtColor(overlay, cv2.COLOR_BGRA2BGR)
+
+        # assegna la matrice sovrapposta alla maschera
+        output_img = (overlay * saliency_mask + (1 - saliency_mask) * img).astype(np.uint8)
+
+        # Crea un'immagine di output dove i punti salienti sono evidenziati in rosso
+        overlay = np.zeros((img.shape[0], img.shape[1], 4), dtype=np.uint8)
+        overlay[saliency_mask == 1] = [0, 0, 255, 128]  # rosso semitrasparente
+        output_img = cv2.addWeighted(img, 0.5, overlay, 0.5, 0)
+
         
         # Mostra l'immagine nella finestra
-        img = (img * 255).astype('uint8')
-        img_tk = ImageTk.PhotoImage(Image.fromarray(img))
+        img_tk = ImageTk.PhotoImage(Image.fromarray(output_img))
         img_label.config(image=img_tk)
         img_label.image = img_tk
-        
 
 # Crea l'interfaccia grafica
 root = tk.Tk()
