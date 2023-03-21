@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow import keras
 import tkinter as tk
 from tkinter import filedialog
+from PIL import Image, ImageTk
 
 # Funzione per selezionare l'immagine
 def select_image():
@@ -12,6 +13,9 @@ def select_image():
     if len(path) > 0:
         # Carica l'immagine
         img = cv2.imread(path)
+        
+        # Converti l'immagine da BGR a RGB
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         
         # Ridimensiona l'immagine a una dimensione fissa
         img = cv2.resize(img, (224, 224))
@@ -37,15 +41,25 @@ def select_image():
         # Aggiorna l'interfaccia grafica con il grado di memorabilità calcolato
         result_label.config(text=f"Grado di memorabilità dell'immagine: {memorability:.2f}")
         
+        # Mostra l'immagine nella finestra
+        img = (img * 255).astype('uint8')
+        img_tk = ImageTk.PhotoImage(Image.fromarray(img))
+        img_label.config(image=img_tk)
+        img_label.image = img_tk
+        
 
 # Crea l'interfaccia grafica
 root = tk.Tk()
 root.title("Calcolo grado di memorabilità")
-root.geometry("400x200")
+root.geometry("600x400")
 
 # Aggiunge un pulsante per selezionare l'immagine
 select_button = tk.Button(root, text="Seleziona immagine", command=select_image)
 select_button.pack(pady=20)
+
+# Aggiunge un'etichetta per mostrare l'immagine
+img_label = tk.Label(root)
+img_label.pack(pady=20)
 
 # Aggiunge una label per mostrare il risultato
 result_label = tk.Label(root, text="")
